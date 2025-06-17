@@ -5,13 +5,9 @@ vtysh
 show running-config
 show ip bgp
 show ip bgp summary
-show ip bgp neighbors
-show ip bgp neighbors 192.168.1.68 received-routes
-show ip bgp neighbors 192.168.1.68 advertised-routes
-show ip bgp neighbors 192.168.1.69 received-routes
-show ip bgp neighbors 192.168.1.69 advertised-routes
 
-
+# Loopscript to run over the branch1vm and spoke1vm
+while true; do
 while true; do
   TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
   RESPONSE=$(curl --max-time 5 -s 10.2.1.4)

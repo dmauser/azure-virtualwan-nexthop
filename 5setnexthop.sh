@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # Parameters
 rg=lab-vwan-nexthop
 

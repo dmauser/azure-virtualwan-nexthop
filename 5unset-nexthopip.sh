@@ -1,5 +1,4 @@
 # Parameters
-# Parameters
 rg=lab-vwan-nexthop
 
 echo Disabling Next Hop IP on NVA VMs

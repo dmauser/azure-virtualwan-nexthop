@@ -9,6 +9,7 @@ This lab demonstrates how to configure a Next Hop IP in Azure Virtual WAN. It in
 
 # Lab Network Diagram
 
+![Lab Network Diagram](./media/diagram.png)
 
 # Deployment Steps
 

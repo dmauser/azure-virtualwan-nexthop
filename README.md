@@ -106,3 +106,5 @@ On the next steps we will enable Next Hop IP on the Virtual WAN, which will now 
 5 - Enable Next Hop IP on the Virtual WAN by running the following script:
 
 ```bash
+curl -sL https://raw.githubusercontent.com/dmauser/azure-virtualwan-nexthop/refs/heads/main/4setnexthop.sh | bash
+```

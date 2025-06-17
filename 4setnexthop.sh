@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Parameters
-rg=lab-vwan-nexthopip
+rg=lab-vwan-nexthop
 
 echo Configuring Next Hop IP on NVA VMs
 

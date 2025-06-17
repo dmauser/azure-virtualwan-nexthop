@@ -78,16 +78,17 @@ curl -sL https://raw.githubusercontent.com/dmauser/azure-virtualwan-nexthop/refs
 4 - Revalidate the connectivity from spoke1vm and branch1vm to the spoke3vm:
 
 ```bash
-    while true; do
-      TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
-      RESPONSE=$(curl --max-time 5 -s 10.2.1.4)
-      if [ $? -eq 0 ]; then
-        echo "[$TIMESTAMP] curl succeeded: $RESPONSE"
-      else
-        echo "[$TIMESTAMP] curl failed or timed out"
-      fi
-      sleep 5
-    done
+while true; do
+while true; do
+  TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+  RESPONSE=$(curl --max-time 5 -s 10.2.1.4)
+  if [ $? -eq 0 ]; then
+    echo "[$TIMESTAMP] curl succeeded: $RESPONSE"
+  else
+    echo "[$TIMESTAMP] curl failed or timed out"
+  fi
+  sleep 5
+done
 ```
 
 Example of expected output:
@@ -113,9 +114,9 @@ On the next steps we will enable Next Hop IP on the Virtual WAN, which will now 
 curl -sL https://raw.githubusercontent.com/dmauser/azure-virtualwan-nexthop/refs/heads/main/4setnexthop.sh | bash
 ```
 
-4 - run couple validations **after** Next Hop IP configuration:
+6 - run couple validations **after** Next Hop IP configuration:
 
-    4.1 - Log in to the NVA instances spoke2-linux-nva1 and spoke2-linux-nva2 (accessible via Serial Console) and review the BGP Next Hop IP configuration:
+    6.1 - Log in to the NVA instances spoke2-linux-nva1 and spoke2-linux-nva2 (accessible via Serial Console) and review the BGP Next Hop IP configuration:
     ```bash
     sudo -s
     vtysh 
@@ -149,7 +150,7 @@ curl -sL https://raw.githubusercontent.com/dmauser/azure-virtualwan-nexthop/refs
     ```
 
 
-  4.2 - Check connectivity from spoke1vm and branch1vm to the spoke3vm which is behind the NVAs:
+  6.2 - Check connectivity from spoke1vm and branch1vm to the spoke3vm which is behind the NVAs:
 
     ```bash
     while true; do

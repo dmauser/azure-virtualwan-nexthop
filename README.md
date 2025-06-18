@@ -16,7 +16,7 @@ The primary goal of this lab is to illustrate the behavior **before and after en
 
 ### Additional Resources
 
-For more information about Next Hop IP support in Azure Virtual WAN, refer to the [official documentation](https:///azure/virtual-wan/next-hop-ip).
+For more information about Next Hop IP support in Azure Virtual WAN, refer to the [official documentation](https://learn.microsoft.com/en-us/azure/virtual-wan/next-hop-ip).
 
 ## Prerequisites
 
@@ -36,6 +36,8 @@ wget -q -O 1deploy.sh https://raw.githubusercontent.com/dmauser/azure-virtualwan
 chmod +x 1deploy.sh
 ./1deploy.sh
 ```
+
+**Note:** The deployment will take approximately 60 minutes to complete. The script shows you the progress but you can also monitor the progress in the Azure Portal under the resource group `lab-vwan-nexthop`.
 
 ### 2. After deployment is completed, run a few validations before configuring Next Hop IP:
 

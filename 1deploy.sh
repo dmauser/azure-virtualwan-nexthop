@@ -8,8 +8,8 @@ fi
 
 # Parameters
 # Prompt for location
-read -p "Enter the location (hit enter for default: westus3): " location
-location=${location:-westus3} # Prompt for location, default to westus3 if not provided
+read -p "Enter the region (hit enter for default: westus3): " region1
+region1=${location:-westus3} # Prompt for region, default to westus3 if not provided
 rg=lab-vwan-nexthop
 vwanname=vwan-nexthop
 hub1name=hub1

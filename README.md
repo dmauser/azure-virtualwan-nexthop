@@ -1,7 +1,12 @@
 # LAB: Azure Virtual WAN Next Hop IP
 
 ## Description
+
 This lab demonstrates how to configure a Next Hop IP in Azure Virtual WAN. It includes the deployment of a Virtual WAN, Virtual Hub, and the necessary configurations to set up a Next Hop IP.
+
+The main goal of this lab is to show the behavior before and after enabling Next Hop IP in Azure Virtual WAN, particularly focusing on the impact of stateful inspection on Network Virtual Appliances (NVAs) when BGP is used for routing.
+
+For more information about Next Hop IP  support for Azure Virtual WAN, consult the [official documentation](https://learn.microsoft.com/en-us/azure/virtual-wan/next-hop-ip).
 
 ## Prerequisites
 - Use [Azure CLI Bash on Linux](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli-linux) or [Azure Cloud Shell CLI Bash](https://shell.azure.com).

@@ -28,49 +28,49 @@ chmod +x 1deploy.sh
 
 ### 2. After deployment is completed, run couple validations before Next Hop IP configuration:
 
-    2.1 - Check Virtual WAN Routers BGP status to the NVA instances:
+#### 2.1 - Check Virtual WAN Routers BGP status to the NVA instances:
 
-    ![](./media/bgppeering.png)
+![](./media/bgppeering.png)
 
-    ![](./media/bgpmetrics.png)
+![](./media/bgpmetrics.png)
 
-    2.2 - Log in to the NVA instances spoke2-linux-nva1 and spoke2-linux-nva2 (accessible via Serial Console) and review the BGP peering configuration:
+#### 2.2 - Log in to the NVA instances spoke2-linux-nva1 and spoke2-linux-nva2 (accessible via Serial Console) and review the BGP peering configuration:
    
-    ```bash
-    sudo -s
-    vtysh 
-    show running-config
-    show ip bgp
-    show ip bgp summary
-    show ip bgp neighbors
-    show ip bgp neighbors 192.168.1.68 received-routes
-    show ip bgp neighbors 192.168.1.68 advertised-routes
-    show ip bgp neighbors 192.168.1.69 received-routes
-    show ip bgp neighbors 192.168.1.69 advertised-routes
-    ```
+```bash
+sudo -s
+vtysh 
+show running-config
+show ip bgp
+show ip bgp summary
+show ip bgp neighbors
+show ip bgp neighbors 192.168.1.68 received-routes
+show ip bgp neighbors 192.168.1.68 advertised-routes
+show ip bgp neighbors 192.168.1.69 received-routes
+show ip bgp neighbors 192.168.1.69 advertised-routes
+```
 
-    2.3 - Check connectivity from spoke1vm and branch1vm to the spoke3vm which is behind the NVAs:
+#### 2.3 - Check connectivity from spoke1vm and branch1vm to the spoke3vm which is behind the NVAs:
     
-    ```bash
-    while true; do
-      TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
-      RESPONSE=$(curl --max-time 5 -s 10.2.1.4)
-      if [ $? -eq 0 ]; then
-        echo "[$TIMESTAMP] curl succeeded: $RESPONSE"
-      else
-        echo "[$TIMESTAMP] curl failed or timed out"
-      fi
-      sleep 5
-    done
-    ```
+```bash
+while true; do
+  TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+  RESPONSE=$(curl --max-time 5 -s 10.2.1.4)
+  if [ $? -eq 0 ]; then
+    echo "[$TIMESTAMP] curl succeeded: $RESPONSE"
+  else
+    echo "[$TIMESTAMP] curl failed or timed out"
+  fi
+  sleep 5
+done
+```
 
-    Example of expected output:
+Example of expected output:
 
-    ```bash
-    [2025-06-17 21:56:41] curl succeeded: spoke3VM
-    [2025-06-17 21:56:46] curl succeeded: spoke3VM
-    [2025-06-17 21:56:51] curl succeeded: spoke3VM
-    ```
+```bash
+[2025-06-17 21:56:41] curl succeeded: spoke3VM
+[2025-06-17 21:56:46] curl succeeded: spoke3VM
+[2025-06-17 21:56:51] curl succeeded: spoke3VM
+```
 
 ### 3. On the Azure Cloud Shell run the script below to enable stateful inspection on the NVAs by running the following script:
 

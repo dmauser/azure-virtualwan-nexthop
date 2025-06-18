@@ -67,7 +67,7 @@ chmod +x 1deploy.sh
     [2025-06-17 21:56:51] curl succeeded: spoke3VM
     ```
 
-3 - On the Azure Cloud Shell run the script below to enable stateful inspection on the NVAs by running the following script:
+3. On the Azure Cloud Shell run the script below to enable stateful inspection on the NVAs by running the following script:
 
 The script below will enable iptables stateful inspection on the NVAs, you can review what is done by clicking on the link [3enablesfi.sh](https://raw.githubusercontent.com/dmauser/azure-virtualwan-nexthop/refs/heads/main/3enablesfi.sh).
 
@@ -75,7 +75,7 @@ The script below will enable iptables stateful inspection on the NVAs, you can r
 curl -sL https://raw.githubusercontent.com/dmauser/azure-virtualwan-nexthop/refs/heads/main/3enablesfi.sh | bash
 ```
 
-4 - Revalidate the connectivity from spoke1vm and branch1vm to the spoke3vm:
+4. Revalidate the connectivity from spoke1vm and branch1vm to the spoke3vm:
 
 ```bash
 while true; do
@@ -108,13 +108,13 @@ The timeouts occur because the NVAs are now enforcing stateful inspection, becau
 
 On the next steps we will enable Next Hop IP on the Virtual WAN, which will now send all traffic to the internal load balancer in front of the NVAs, and that will keep the traffic symmetric and the stateful inspection will work as expected.
 
-5 - Enable Next Hop IP on the Virtual WAN by running the following script:
+5. Enable Next Hop IP on the Virtual WAN by running the following script:
 
 ```bash
 curl -sL https://raw.githubusercontent.com/dmauser/azure-virtualwan-nexthop/refs/heads/main/4setnexthop.sh | bash
 ```
 
-6 - run couple validations **after** Next Hop IP configuration:
+6. run couple validations **after** Next Hop IP configuration:
 
     6.1 - Log in to the NVA instances spoke2-linux-nva1 and spoke2-linux-nva2 (accessible via Serial Console) and review the BGP Next Hop IP configuration:
     ```bash
@@ -177,6 +177,8 @@ curl -sL https://raw.githubusercontent.com/dmauser/azure-virtualwan-nexthop/refs
     [2025-06-17 22:44:32] curl succeeded: spoke3VM
     [2025-06-17 22:44:37] curl succeeded: spoke3VM
     ```
+
+
 ## Cleanup
 
 To clean up the resources created in this lab, run the following command in your Azure CLI Bash:
@@ -184,4 +186,3 @@ To clean up the resources created in this lab, run the following command in your
 ```bash
 az group delete --name lab-vwan-nexthop --yes --no-wait
 ```
-

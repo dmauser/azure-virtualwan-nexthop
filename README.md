@@ -34,7 +34,17 @@ chmod +x 1deploy.sh
 
 ![](./media/bgpmetrics.png)
 
-#### 2.2 - Log in to the NVA instances spoke2-linux-nva1 and spoke2-linux-nva2 (accessible via Serial Console) and review the BGP peering configuration:
+
+#### 2.2 - Review the effective routes in the Virtual Hub using Azure Portal:
+
+
+
+
+
+As
+
+
+#### 2.3 - Log in to the NVA instances spoke2-linux-nva1 and spoke2-linux-nva2 (accessible via Serial Console) and review the BGP peering configuration:
    
 ```bash
 sudo -s
@@ -49,7 +59,7 @@ show ip bgp neighbors 192.168.1.69 received-routes
 show ip bgp neighbors 192.168.1.69 advertised-routes
 ```
 
-#### 2.3 - Check connectivity from spoke1vm and branch1vm to the spoke3vm which is behind the NVAs:
+#### 2.4 - Check connectivity from spoke1vm and branch1vm to the spoke3vm which is behind the NVAs:
     
 ```bash
 while true; do
@@ -107,11 +117,11 @@ Example of expected output:
 [2025-06-17 22:00:01] curl failed or timed out
 ```
 
-Why there are timeout after I enabled stateful inspection on the NVAs?
+**Why are there timeouts after enabling stateful inspection on the NVAs?**
 
-The timeouts occur because the NVAs are now enforcing stateful inspection, because on the original setup we have direct BGP from both NVAs to the Virtual WAN routers, that will cause BGP ECMP (equal cost multipath) in the traffic which by design BGP behavior.
+The timeouts are occurring because the NVAs are now enforcing stateful inspection. In the original setup, both NVAs established direct BGP sessions with the Virtual WAN routers. This configuration introduced BGP ECMP (Equal-Cost Multi-Path), which caused traffic to be distributed across both NVAs. As a result, return traffic could take a different path than the initial request, breaking the symmetry required for stateful inspection to function correctly.
 
-On the next steps we will enable Next Hop IP on the Virtual WAN, which will now send all traffic to the internal load balancer in front of the NVAs, and that will keep the traffic symmetric and the stateful inspection will work as expected.
+To resolve this, the next step is to enable the "Next Hop IP" feature on the Virtual WAN. This change will route all traffic through an internal load balancer positioned in front of the NVAs. By doing so, traffic symmetry will be preserved, allowing stateful inspection to operate as expected.
 
 ### 5. Enable Next Hop IP on the Virtual WAN by running the following script:
 
@@ -183,6 +193,13 @@ curl -sL https://raw.githubusercontent.com/dmauser/azure-virtualwan-nexthop/refs
     [2025-06-17 22:44:37] curl succeeded: spoke3VM
     ```
 
+### (Optional) Disable Next Hop IP
+
+If you want to disable Next Hop IP, you can run the following script:
+
+```bash
+curl -sL https://raw.githubusercontent.com/dmauser/azure-virtualwan-nexthop/refs/heads/main/unset-nexthopip.sh | bash
+```
 
 ## Cleanup
 

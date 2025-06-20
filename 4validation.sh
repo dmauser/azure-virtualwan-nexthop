@@ -1,7 +1,5 @@
 #!/bin/bash
 # Loopscript to run over the branch1vm and spoke1vm
-
-while true; do
 while true; do
   TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
   RESPONSE=$(curl --max-time 5 -s 10.2.1.4)
@@ -12,5 +10,3 @@ while true; do
   fi
   sleep 5
 done
-
-

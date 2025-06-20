@@ -62,10 +62,10 @@ show running-config
 show ip bgp
 show ip bgp summary
 show ip bgp neighbors
-show ip bgp neighbors 192.168.1.68 received-routes
-show ip bgp neighbors 192.168.1.68 advertised-routes
 show ip bgp neighbors 192.168.1.69 received-routes
 show ip bgp neighbors 192.168.1.69 advertised-routes
+show ip bgp neighbors 192.168.1.70 received-routes
+show ip bgp neighbors 192.168.1.70 advertised-routes
 ```
 
 #### 2.4 - Check connectivity from spoke1vm and branch1vm to spoke3vm (which is behind the NVAs):

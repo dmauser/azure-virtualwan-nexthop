@@ -9,4 +9,5 @@ router bgp 65002
  exit-address-family
 exit
 write memory
+write file
 EOVTYSH

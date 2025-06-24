@@ -13,4 +13,7 @@ router bgp 65002
 exit
 EOVTYSH
 
+sudo vtysh -c "write memory"
+
+
 

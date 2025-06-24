@@ -15,5 +15,6 @@ router bgp 65002
   neighbor $neighbor2 route-map lbnexthop out
  exit-address-family
 exit
-write
 EOVTYSH
+
+sudo vtysh -c "write memory"

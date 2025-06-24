@@ -9,8 +9,7 @@ nvalbip=$(az network lb frontend-ip list -g $rg --lb-name spoke2-linux-nva-ilb -
 
 # Get vHub BGP peer address and display virtual router IPs
 neighbor1=$(az network vhub show -g $rg -n hub1 --query virtualRouterIps[0] -o tsv)
-neighbor2=$(az network vhub show -g $rg -n hub1 --query virtualRouterIps[2] -o tsv)
-
+neighbor2=$(az network vhub show -g $rg -n hub1 --query virtualRouterIps[1] -o tsv)
 
 # Configure Next Hop IP on spoke2-linux-nva1
 echo Configuring Next Hop IP on spoke2-linux-nva1

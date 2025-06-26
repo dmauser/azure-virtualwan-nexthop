@@ -162,17 +162,17 @@ router bgp 65002
   bgp router-id 10.2.0.36
   no bgp ebgp-requires-policy
   no bgp network import-check
-  neighbor 192.168.1.68 remote-as 65515
-  neighbor 192.168.1.68 ebgp-multihop
   neighbor 192.168.1.69 remote-as 65515
   neighbor 192.168.1.69 ebgp-multihop
+  neighbor 192.168.1.70 remote-as 65515
+  neighbor 192.168.1.70 ebgp-multihop
   !
   address-family ipv4 unicast
   network 10.2.0.0/16
-  neighbor 192.168.1.68 soft-reconfiguration inbound
-  neighbor 192.168.1.68 route-map lbnexthop out       <-- This is the route-map applied to the vHub router 192.168.1.68>
   neighbor 192.168.1.69 soft-reconfiguration inbound
-  neighbor 192.168.1.69 route-map lbnexthop out       <-- This is the route-map applied to the vHub router 192.168.1.69>
+  neighbor 192.168.1.69 route-map lbnexthop out       <-- This is the route-map applied to the vHub router 192.168.1.68>
+  neighbor 192.168.1.70 soft-reconfiguration inbound
+  neighbor 192.168.1.70 route-map lbnexthop out       <-- This is the route-map applied to the vHub router 192.168.1.69>
   exit-address-family
 exit
 !

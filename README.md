@@ -70,7 +70,7 @@ show ip bgp neighbors 192.168.1.70 advertised-routes
 
 #### 2.4 - Check connectivity from spoke1vm and branch1vm to spoke3vm (which is behind the NVAs):
 
-Run the following script inside the spoke1vm and branch1vm (accessible via Serial Console) instances to check connectivity to spoke3vm:
+Run the following script inside the spoke1vm and branch1vm (accessible via Serial Console) to check connectivity to spoke3vm:
 
 ```bash
 while true; do
@@ -102,7 +102,7 @@ curl -sL https://raw.githubusercontent.com/dmauser/azure-virtualwan-nexthop/refs
 
 ### 4. Revalidate connectivity from spoke1vm and branch1vm to spoke3vm:
 
-Run the following script inside the spoke1vm and branch1vm (accessible via Serial Console) instances to check connectivity to spoke3vm:
+Run the following script inside the spoke1vm and branch1vm (accessible via Serial Console) to check connectivity to spoke3vm:
 
 ```bash
 while true; do

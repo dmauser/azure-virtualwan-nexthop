@@ -170,9 +170,9 @@ router bgp 65002
   address-family ipv4 unicast
   network 10.2.0.0/16
   neighbor 192.168.1.69 soft-reconfiguration inbound
-  neighbor 192.168.1.69 route-map lbnexthop out       <-- This is the route-map applied to the vHub router 192.168.1.68>
+  neighbor 192.168.1.69 route-map lbnexthop out       <-- This is the route-map applied to the vHub router 192.168.1.69>
   neighbor 192.168.1.70 soft-reconfiguration inbound
-  neighbor 192.168.1.70 route-map lbnexthop out       <-- This is the route-map applied to the vHub router 192.168.1.69>
+  neighbor 192.168.1.70 route-map lbnexthop out       <-- This is the route-map applied to the vHub router 192.168.1.70>
   exit-address-family
 exit
 !

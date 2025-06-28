@@ -16,6 +16,7 @@ hub1name=hub1
 # Prompt for username with default suggestion
 read -p "Enter username [azureuser]: " username
 username=${username:-azureuser}
+vmsize=Standard_DS1_v2
 
 # Prompt for password with confirmation
 while true; do
@@ -29,7 +30,6 @@ while true; do
         echo "Passwords do not match or are empty. Please try again."
     fi
 done
-vmsize=Standard_DS1_v2
 
 #Variables
 mypip=$(curl -4 ifconfig.io -s)
@@ -145,11 +145,12 @@ do
  routeserver_IP2=$(az network vhub show -n $hubtopeer -g $rg --query virtualRouterIps[1] -o tsv)
 
  # Enable routing and NAT on Linux NVA:
- scripturi="https://raw.githubusercontent.com/dmauser/AzureVM-Router/master/scripts/linuxrouterbgpfrr.sh"
+ # scripturi="https://raw.githubusercontent.com/dmauser/AzureVM-Router/master/scripts/linuxrouterbgpfrr.sh"
+ scripturi="https://raw.githubusercontent.com/dmauser/azure-virtualwan-nexthop/refs/heads/main/scripts/linuxrouterbgpfrr.sh"
  az vm extension set --resource-group $rg --vm-name $nvaname  --name customScript --publisher Microsoft.Azure.Extensions \
- --protected-settings "{\"fileUris\": [\"$scripturi\"],\"commandToExecute\": \"./linuxrouterbgpfrr.sh $asn_frr $bgp_routerId $bgp_network1 $routeserver_IP1 $routeserver_IP2\"}" \
+ --protected-settings "{\"fileUris\": [\"$scripturi\"],\"commandToExecute\": \"./linuxrouterbgpfrr.sh $asn_frr $bgp_routerId $bgp_network1 $routeserver_IP1 $routeserver_IP2 $username\"}" \
  --no-wait
-
+ 
  # Build Virtual Router BGP Peering
  az network vhub bgpconnection create --resource-group $rg \
  --vhub-name $hubtopeer \

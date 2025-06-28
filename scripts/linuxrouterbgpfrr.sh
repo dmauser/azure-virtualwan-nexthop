@@ -15,12 +15,10 @@ sed -i "/net.ipv6.conf.all.forwarding=1/ s/# *//" /etc/sysctl.conf
 
 ## Install the frr routing daemon
 echo "Installing frr"
-curl -s https://deb.frrouting.org/frr/keys.asc | sudo apt-key add -
-FRRVER="frr-stable"
-echo deb https://deb.frrouting.org/frr $(lsb_release -s -c) $FRRVER | sudo tee -a /etc/apt/sources.list.d/frr.list
-
+#curl -s https://deb.frrouting.org/frr/keys.asc | sudo apt-key add -
+#FRRVER="frr-stable"
+#echo deb https://deb.frrouting.org/frr $(lsb_release -s -c) $FRRVER | sudo tee -a /etc/apt/sources.list.d/frr.list
 apt-get -y update
-
 apt-get -y install frr frr-pythontools
 
 ##  run the updates and ensure the packages are up to date and there is no new version available for the packages

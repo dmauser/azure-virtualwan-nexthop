@@ -45,7 +45,7 @@ fi
 # Start a background keepalive process only in Cloud Shell
 if $is_cloudshell; then
     echo "Azure Cloud Shell detected: starting keepalive to prevent timeout."
-    (while true; do echo -e "\nCloud Shell keepalive every 5 min\n"; sleep 300; done) &
+    (while true; do echo -e "\nCloud Shell keepalive\n"; sleep 300; done) &
     keepalive_pid=$!
 fi
 
@@ -87,7 +87,7 @@ az network vnet subnet update --id $(az network vnet list -g $rg --query '[].{id
 echo Creating VPN Gateway in branch1...
 az network vnet subnet create -g $rg --vnet-name branch1 -n GatewaySubnet --address-prefixes 10.100.100.0/26 --output none
 az network public-ip create -n branch1-vpngw-pip -g $rg --location $region1 --output none 
-az network vnet-gateway create -n branch1-vpngw --public-ip-addresses branch1-vpngw-pip -g $rg --vnet branch1 --asn 65510 --gateway-type Vpn -l $region1 --sku VpnGw1 --vpn-gateway-generation Generation1 &>/dev/null &
+az network vnet-gateway create -n branch1-vpngw --public-ip-addresses branch1-vpngw-pip -g $rg --vnet branch1 --asn 65510 --gateway-type Vpn -l $region1 --sku VpnGw1 --vpn-gateway-generation Generation1 --no-wait --output none
 
 echo "Checking Hub1 provisioning status..."
 prState=$(az network vhub show -g $rg -n $hub1name --query 'provisioningState' -o tsv)

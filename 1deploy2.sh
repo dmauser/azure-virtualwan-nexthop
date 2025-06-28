@@ -45,7 +45,7 @@ fi
 # Start a background keepalive process only in Cloud Shell
 if $is_cloudshell; then
     echo "Azure Cloud Shell detected: starting keepalive to prevent timeout."
-    (while true; do echo -n "Cloud Shell keepalive every 5 min"; sleep 300; done) &
+    (while true; do echo -e "\nCloud Shell keepalive every 5 min\n"; sleep 300; done) &
     keepalive_pid=$!
 fi
 

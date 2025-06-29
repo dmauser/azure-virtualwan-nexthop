@@ -1,7 +1,6 @@
 #!/bin/bash
 rg=lab-vwan-nexthop
 
-echo "Enabling stateful inspection on Linux NVA VMs in $rg..."
 # Enable IP Tables 
 echo "Enabling stateful inspection on spoke1-linux-nva1..."
 scripturi="https://raw.githubusercontent.com/dmauser/azure-virtualwan-nexthop/refs/heads/main/scripts/iptables.sh"

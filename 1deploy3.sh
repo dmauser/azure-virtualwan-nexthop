@@ -101,6 +101,7 @@ echo "provisioningState=Succeeded"
 echo Creating Hub1 VPN Gateway...
 az network vpn-gateway create -n $hub1name-vpngw -g $rg --location $region1 --vhub $hub1name --no-wait 
 
+echo "Checking Hub1 routing status..."
 rtState=$(az network vhub show -g $rg -n $hub1name --query 'routingState' -o tsv)
 while [[ $rtState != 'Provisioned' ]]; do
     echo "routingState=$rtState"
@@ -276,12 +277,15 @@ vwanh1gwbgp2=$(az network vpn-gateway show -n $hub1name-vpngw -g $rg --query 'bg
 vwanh1gwpip2=$(az network vpn-gateway show -n $hub1name-vpngw -g $rg --query 'bgpSettings.bgpPeeringAddresses[1].tunnelIpAddresses[0]' -o tsv)
 
 # Creating virtual wan vpn site
+echo Creating virtual wan vpn site...
 az network vpn-site create --ip-address $pip1 -n site-branch1 -g $rg --asn 65510 --bgp-peering-address $bgp1 -l $region1 --virtual-wan $vwanname --device-model 'Azure' --device-vendor 'Microsoft' --link-speed '50' --with-link true --output none
 
 # Creating virtual wan vpn connection
+echo Creating virtual wan vpn connection...
 az network vpn-gateway connection create --gateway-name $hub1name-vpngw -n site-branch1-conn -g $rg --enable-bgp true --remote-vpn-site site-branch1 --internet-security --shared-key 'abc123' --output none
 
 # Creating connection from vpn gw to local gateway and watch for connection succeeded
+echo Creating connection from Branch VPN Gateway to Local Gateway...
 az network local-gateway create -g $rg -n lng-$hub1name-gw1 --gateway-ip-address $vwanh1gwpip1 --asn 65515 --bgp-peering-address $vwanh1gwbgp1 -l $region1 --output none
 az network vpn-connection create -n branch1-to-$hub1name-gw1 -g $rg -l $region1 --vnet-gateway1 branch1-vpngw --local-gateway2 lng-$hub1name-gw1 --enable-bgp --shared-key 'abc123' --output none
 

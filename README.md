@@ -27,7 +27,7 @@ For more information about Next Hop IP support in Azure Virtual WAN, refer to th
 
 ![Lab Network Diagram](./media/diagram.png)
 
-Open diagram using [Excalidraw](https://excalidraw.com/#url=https://raw.githubusercontent.com/dmauser/azure-virtualwan-nexthop/main/diagram.excalidraw)
+[Open diagram with Excalidraw](https://excalidraw.com/#url=https://raw.githubusercontent.com/dmauser/azure-virtualwan-nexthop/main/diagram.excalidraw){:target="_blank"}
 
 ## Deployment Steps
 

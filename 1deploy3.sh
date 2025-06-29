@@ -110,7 +110,8 @@ while [[ $rtState != 'Provisioned' ]]; do
 done
 echo "routingState=Provisioned"
 
-# Create spoke to Vwan connections to hub1
+# Connecting spoke1 and spoke2 to hub1
+echo "Connecting spoke1 and spoke2 to hub1..."
 az network vhub connection create -n spoke1-conn --remote-vnet spoke1 -g $rg --vhub-name $hub1name --no-wait
 az network vhub connection create -n spoke2-conn --remote-vnet spoke2 -g $rg --vhub-name $hub1name --no-wait
 

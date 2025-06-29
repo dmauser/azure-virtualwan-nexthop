@@ -37,7 +37,20 @@ mypip=$(curl -4 ifconfig.io -s)
 start=`date +%s`
 echo "Script started at $(date)"
 
-# Creating rg
+# Detect if running in Azure Cloud Shell
+is_cloudshell=false
+if [[ "$ACC_TERM" == "1" ]] || [[ "$AZURE_HTTP_USER_AGENT" == *"cloud-shell"* ]] || [[ "$(hostname)" == SandboxHost-* ]]; then
+    is_cloudshell=true
+fi
+# Start a background keepalive process only in Cloud Shell
+if $is_cloudshell; then
+    echo "Azure Cloud Shell detected: starting keepalive to prevent timeout."
+    (while true; do echo -e "\nCloud Shell keepalive\n"; sleep 300; done) &
+    keepalive_pid=$!
+fi
+
+# Creating Resource Group
+echo Creating Resource Group...
 az group create -n $rg -l $region1 --output none
 
 # Creating virtual wan and hub1
@@ -74,7 +87,7 @@ az network vnet subnet update --id $(az network vnet list -g $rg --query '[].{id
 echo Creating VPN Gateway in branch1...
 az network vnet subnet create -g $rg --vnet-name branch1 -n GatewaySubnet --address-prefixes 10.100.100.0/26 --output none
 az network public-ip create -n branch1-vpngw-pip -g $rg --location $region1 --output none 
-az network vnet-gateway create -n branch1-vpngw --public-ip-addresses branch1-vpngw-pip -g $rg --vnet branch1 --asn 65510 --gateway-type Vpn -l $region1 --sku VpnGw1 --vpn-gateway-generation Generation1 --no-wait --only-show-errors
+az network vnet-gateway create -n branch1-vpngw --public-ip-addresses branch1-vpngw-pip -g $rg --vnet branch1 --asn 65510 --gateway-type Vpn -l $region1 --sku VpnGw1 --vpn-gateway-generation Generation1 --no-wait --output none
 
 echo "Checking Hub1 provisioning status..."
 prState=$(az network vhub show -g $rg -n $hub1name --query 'provisioningState' -o tsv)
@@ -85,6 +98,10 @@ while [[ $prState != 'Succeeded' ]]; do
 done
 echo "provisioningState=Succeeded"
 
+echo Creating Hub1 VPN Gateway...
+az network vpn-gateway create -n $hub1name-vpngw -g $rg --location $region1 --vhub $hub1name --no-wait 
+
+echo "Checking Hub1 routing status..."
 rtState=$(az network vhub show -g $rg -n $hub1name --query 'routingState' -o tsv)
 while [[ $rtState != 'Provisioned' ]]; do
     echo "routingState=$rtState"
@@ -93,7 +110,8 @@ while [[ $rtState != 'Provisioned' ]]; do
 done
 echo "routingState=Provisioned"
 
-# Create spoke to Vwan connections to hub1
+# Connecting spoke1 and spoke2 to hub1
+echo "Connecting spoke1 and spoke2 to hub1..."
 az network vhub connection create -n spoke1-conn --remote-vnet spoke1 -g $rg --vhub-name $hub1name --no-wait
 az network vhub connection create -n spoke2-conn --remote-vnet spoke2 -g $rg --vhub-name $hub1name --no-wait
 
@@ -135,22 +153,26 @@ az network vnet subnet create -g $rg --vnet-name spoke2 -n nvasubnet --address-p
 for nvaname in $nvanames
 do
  # Enable routing, NAT and BGP on Linux NVA:
+ echo "Creating NVA instance: $nvaname"
  az network public-ip create --name $nvaname-pip --resource-group $rg --location $region1 --sku Standard --output none --only-show-errors
  az network nic create --name $nvaname-nic --resource-group $rg --subnet $nvasubnetname --vnet $nvavnetnamer1 --public-ip-address $nvaname-pip --ip-forwarding true --location $region1 -o none
  az vm create --resource-group $rg --location $region1 --name $nvaname --size $vmsize --nics $nvaname-nic  --image Ubuntu2204 --admin-username $username --admin-password $password -o none --only-show-errors
 
  #NVA BGP config variables (do not change)
+ echo "Configuring BGP on NVA: $nvaname"
  bgp_routerId=$(az network nic show --name $nvaname-nic --resource-group $rg --query ipConfigurations[0].privateIPAddress -o tsv)
  routeserver_IP1=$(az network vhub show -n $hubtopeer -g $rg --query virtualRouterIps[0] -o tsv)
  routeserver_IP2=$(az network vhub show -n $hubtopeer -g $rg --query virtualRouterIps[1] -o tsv)
 
  # Enable routing and NAT on Linux NVA:
- scripturi="https://raw.githubusercontent.com/dmauser/azure-virtualwan-nexthop/refs/heads/main/scripts/linuxrouterbgpfrr.sh"
+ echo "Enabling routing and NAT on NVA: $nvaname"
+  scripturi="https://raw.githubusercontent.com/dmauser/azure-virtualwan-nexthop/refs/heads/main/scripts/linuxrouterbgpfrr.sh"
  az vm extension set --resource-group $rg --vm-name $nvaname  --name customScript --publisher Microsoft.Azure.Extensions \
  --protected-settings "{\"fileUris\": [\"$scripturi\"],\"commandToExecute\": \"./linuxrouterbgpfrr.sh $asn_frr $bgp_routerId $bgp_network1 $routeserver_IP1 $routeserver_IP2 $username\"}" \
  --no-wait
  
  # Build Virtual Router BGP Peering
+ echo "Creating BGP connection from NVA: $nvaname to vWAN hub: $hubtopeer"
  az network vhub bgpconnection create --resource-group $rg \
  --vhub-name $hubtopeer \
  --name $nvaname \
@@ -166,7 +188,8 @@ az network lb create -g $rg --name $nvavnetnamer1-$nvaintname-ilb --sku Standard
 az network lb probe create -g $rg --lb-name $nvavnetnamer1-$nvaintname-ilb --name sshprobe --protocol tcp --port 22 --output none  
 az network lb rule create -g $rg --lb-name $nvavnetnamer1-$nvaintname-ilb --name haportrule1 --protocol all --frontend-ip-name frontendip1 --backend-pool-name nvabackend --probe-name sshprobe --frontend-port 0 --backend-port 0 --output none
 
-# Attach NVAs to the Backend as NICs
+# Attach NVAs to the Load Balancer Backend as NICs
+echo Attaching NVAs to the Load Balancer Backend as NICs...
 for nvaname in $nvanames
 do
   az network nic ip-config address-pool add \
@@ -189,9 +212,6 @@ az network vnet subnet update --vnet-name spoke3 -g $rg --name main --route-tabl
 az network route-table create -g $rg -n spoke4-rt --location $region1 --output none
 az network route-table route create -g $rg --route-table-name spoke4-rt -n spoke2 --address-prefix 0.0.0.0/0 --next-hop-type VirtualAppliance --next-hop-ip-address $nvalbip --output none
 az network vnet subnet update --vnet-name spoke4 -g $rg --name main --route-table spoke4-rt --output none
-
-echo Creating Hub1 VPN Gateway...
-az network vpn-gateway create -n $hub1name-vpngw -g $rg --location $region1 --vhub $hub1name --no-wait 
 
 echo Validating vHubs VPN Gateways provisioning...
 #vWAN Hubs VPN Gateway Status
@@ -232,7 +252,7 @@ else
 fi
 
 echo Enabling boot diagnostics
-az vm boot-diagnostics enable --ids $(az vm list -g $rg --query '[].{id:id}' -o tsv) -o none
+az vm boot-diagnostics enable --ids $(az vm list -g $rg --query '[].{id:id}' -o tsv) -o none &>/dev/null &
 
 ### Installing tools for networking connectivity validation such as traceroute, tcptraceroute, iperf and others (check link below for more details) 
 echo "Installing net utilities inside VMs (traceroute, tcptraceroute, iperf3, hping3, and others)"
@@ -258,17 +278,26 @@ vwanh1gwbgp2=$(az network vpn-gateway show -n $hub1name-vpngw -g $rg --query 'bg
 vwanh1gwpip2=$(az network vpn-gateway show -n $hub1name-vpngw -g $rg --query 'bgpSettings.bgpPeeringAddresses[1].tunnelIpAddresses[0]' -o tsv)
 
 # Creating virtual wan vpn site
+echo Creating virtual wan vpn site...
 az network vpn-site create --ip-address $pip1 -n site-branch1 -g $rg --asn 65510 --bgp-peering-address $bgp1 -l $region1 --virtual-wan $vwanname --device-model 'Azure' --device-vendor 'Microsoft' --link-speed '50' --with-link true --output none
 
 # Creating virtual wan vpn connection
+echo Creating virtual wan vpn connection...
 az network vpn-gateway connection create --gateway-name $hub1name-vpngw -n site-branch1-conn -g $rg --enable-bgp true --remote-vpn-site site-branch1 --internet-security --shared-key 'abc123' --output none
 
 # Creating connection from vpn gw to local gateway and watch for connection succeeded
+echo Creating connection from Branch VPN Gateway to Local Gateway...
 az network local-gateway create -g $rg -n lng-$hub1name-gw1 --gateway-ip-address $vwanh1gwpip1 --asn 65515 --bgp-peering-address $vwanh1gwbgp1 -l $region1 --output none
 az network vpn-connection create -n branch1-to-$hub1name-gw1 -g $rg -l $region1 --vnet-gateway1 branch1-vpngw --local-gateway2 lng-$hub1name-gw1 --enable-bgp --shared-key 'abc123' --output none
 
 az network local-gateway create -g $rg -n lng-$hub1name-gw2 --gateway-ip-address $vwanh1gwpip2 --asn 65515 --bgp-peering-address $vwanh1gwbgp2 -l $region1 --output none
 az network vpn-connection create -n branch1-to-$hub1name-gw2 -g $rg -l $region1 --vnet-gateway1 branch1-vpngw --local-gateway2 lng-$hub1name-gw2 --enable-bgp --shared-key 'abc123' --output none
+
+# Kill keepalive process if running
+if $is_cloudshell && [[ -n "$keepalive_pid" ]]; then
+    kill $keepalive_pid >/dev/null 2>&1
+    echo "Stopped keepalive process"
+fi
 
 echo Deployment has finished
 # Add script ending time but hours, minutes and seconds
@@ -276,4 +305,3 @@ end=`date +%s`
 runtime=$((end-start))
 echo "Script finished at $(date)"
 echo "Total script execution time: $(($runtime / 3600)) hours $((($runtime / 60) % 60)) minutes and $(($runtime % 60)) seconds."
-
